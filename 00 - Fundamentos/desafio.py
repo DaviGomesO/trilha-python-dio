@@ -1,15 +1,17 @@
 menu = """
+    ======== MENU ========
 
-[d] Depositar
-[s] Sacar
-[e] Extrato
-[q] Sair
-
+        [1] - Depositar
+        [2] - Sacar
+        [3] - Extrato
+        [0] - Sair
+    
+    Digite a opção desejada: 
 => """
 
 saldo = 0
 limite = 500
-extrato = ""
+extrato = []
 numero_saques = 0
 LIMITE_SAQUES = 3
 
@@ -17,17 +19,18 @@ while True:
 
     opcao = input(menu)
 
-    if opcao == "d":
+    if opcao == "1":
         valor = float(input("Informe o valor do depósito: "))
 
         if valor > 0:
             saldo += valor
-            extrato += f"Depósito: R$ {valor:.2f}\n"
+            extrato.append(("Depósito", valor))
+            print(f"Depósito de R$ {valor:.2f} realizado com sucesso!")
 
         else:
             print("Operação falhou! O valor informado é inválido.")
 
-    elif opcao == "s":
+    elif opcao == "2":
         valor = float(input("Informe o valor do saque: "))
 
         excedeu_saldo = valor > saldo
@@ -47,19 +50,24 @@ while True:
 
         elif valor > 0:
             saldo -= valor
-            extrato += f"Saque: R$ {valor:.2f}\n"
+            extrato.append(("Saque", valor))
+            print(f"Saque de R$ {valor:.2f} realizado com sucesso!")
             numero_saques += 1
 
         else:
             print("Operação falhou! O valor informado é inválido.")
 
-    elif opcao == "e":
+    elif opcao == "3":
         print("\n================ EXTRATO ================")
-        print("Não foram realizadas movimentações." if not extrato else extrato)
-        print(f"\nSaldo: R$ {saldo:.2f}")
+        if extrato:
+            for op in extrato:
+                print(f'{op[0]}: R${op[1]:.2f}\n')
+        else:
+            print("Não foram realizadas movimentações.")
+        print(f"\nSaldo: R$ {saldo:.2f}\n")
         print("==========================================")
 
-    elif opcao == "q":
+    elif opcao == "0":
         break
 
     else:
