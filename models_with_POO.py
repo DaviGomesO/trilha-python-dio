@@ -136,30 +136,40 @@ class History:
         header = "\n================ EXTRATO ================"
         extract = ""
         transactions = self.transactions
-        if transactions:
-            if type_transaction == "D":
-                header = "\n================ EXTRATO - DEPÓSITO ================"
-                deposits = [op for op in transactions if op["type"] == "Deposit"]
-                if deposits:
-                    for op in deposits:
-                        extract += f"\n{op['date']}\nOperação: Depósito\nValor:\tR$ {op['value']:.2f}\n"
-                else:
-                    extract = "Não foram realizadas movimentações de depósito."
-            elif type_transaction == "S":
-                header = "\n================ EXTRATO - SAQUE ================"
-                withdrawals = [op for op in transactions if op["type"] == "Withdrawal"]
-                if withdrawals:
-                    for op in withdrawals:
-                        extract += f"\n{op['date']}\nOperação: Saque\nValor:\tR$ {op['value']:.2f}\n"
-                else:
-                    extract = "Não foram realizadas movimentações de saque."
-            else:
-                for op in transactions:
-                    extract += f"\n{op['date']}\nOperação: {'Depósito' if op['type'] == 'Deposit' else 'Saque'}\nValor:\tR$ {op['value']:.2f}\n"
+        if not transactions:
+            yield header
+            yield "Não foram realizadas movimentações."
+            return
+
+        if type_transaction == "D":
+            header = "\n================ EXTRATO - DEPÓSITO ================"
+            yield header
+            deposits = [op for op in transactions if op["type"] == "Deposit"]
+            if not deposits:
+                extract = "Não foram realizadas movimentações de depósito."
+                yield extract
+                return
+            
+            for op in deposits:
+                extract = f"\n{op['date']}\nOperação: Depósito\nValor:\tR$ {op['value']:.2f}\n"
+                yield extract
+        elif type_transaction == "S":
+            header = "\n================ EXTRATO - SAQUE ================"
+            yield header
+            withdrawals = [op for op in transactions if op["type"] == "Withdrawal"]
+            if not withdrawals:
+                extract = "Não foram realizadas movimentações de saque."
+                yield extract
+                return
+            for op in withdrawals:
+                extract = f"\n{op['date']}\nOperação: Saque\nValor:\tR$ {op['value']:.2f}\n"
+                yield extract
         else:
-            extract = "Não foram realizadas movimentações."
-        print(header)
-        print(extract)
+            yield header
+            for op in transactions:
+                type_op = 'Depósito' if op['type'] == 'Deposit' else 'Saque'
+                extract = f"\n{op['date']}\nOperação: {type_op}\nValor:\tR$ {op['value']:.2f}\n"
+                yield extract
         
     
 class Transaction(ABC):

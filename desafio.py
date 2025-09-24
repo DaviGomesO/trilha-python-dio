@@ -68,7 +68,10 @@ def mostrar_extrato(clientes):
 
   type_transaction = input("Informe o tipo de transação para o extrato (D-Depósito, S-Saque ou Enter para todos): ").upper()
   
-  conta.history.generate_report(type_transaction if type_transaction in ["D", "S"] else None)
+  report = conta.history.generate_report(type_transaction if type_transaction in ["D", "S"] else None)
+
+  for line in report:
+    print(line)
   
   print(f"\nSaldo: R$ {conta.balance:.2f}")
   print("==========================================")
