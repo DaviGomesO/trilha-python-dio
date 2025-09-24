@@ -33,6 +33,9 @@ class NaturalPerson(Client):
         self.birth_date = birth_date
         self.cpf = cpf
 
+    def __repr__(self):
+        return f"<{self.__class__.__name__}: ({self.cpf})"
+
     
 class Account:
     def __init__(self, client, number):
@@ -129,6 +132,9 @@ class CurrentAccount(Account):
 
     def __str__(self):
         return f"Agency: {self.agency} | Current Account: {self.number} | Client: {self.client.name}"
+    
+    def __repr__(self):
+        return f"<{self.__class__.__name__}: ({self.agency}, {self.number}, {self.client.name})>"
 
 
 class History:

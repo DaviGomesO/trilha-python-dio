@@ -20,7 +20,7 @@ def menu():
   return opcao
 
 @log_transaction
-def deposito(clientes):
+def deposito(clientes, valor):
     cpf = input("Informe o CPF do cliente: ")
     cliente = buscar_cliente(cpf, clientes)
     if not cliente:
@@ -31,14 +31,13 @@ def deposito(clientes):
     if not conta:
       return
 
-    valor = float(input("Informe o valor do depósito: "))
     transacao = Deposit(valor)
 
     cliente.carry_out_transaction(transacao, conta)
     return True
 
 @log_transaction
-def saque(clientes):
+def saque(clientes, valor):
     cpf = input("Informe o CPF do cliente: ")
     cliente = buscar_cliente(cpf, clientes)
     if not cliente:
@@ -49,7 +48,6 @@ def saque(clientes):
     if not conta:
       return
 
-    valor = float(input("Informe o valor do saque: "))
     transacao = Withdrawal(valor)
 
     cliente.carry_out_transaction(transacao, conta)
@@ -151,9 +149,11 @@ def main():
       opcao = menu()
 
       if opcao == 1:
-          deposito(clientes)
+          valor = float(input("Informe o valor do depósito: "))
+          deposito(clientes, valor)
       elif opcao == 2:
-          saque(clientes)
+          valor = float(input("Informe o valor do saque: "))
+          saque(clientes, valor)
       elif opcao == 3:
           mostrar_extrato(clientes)
       elif opcao == 4:
