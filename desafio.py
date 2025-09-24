@@ -1,5 +1,6 @@
 from models_with_POO import *
 from decorator import log_transaction
+from iterator import AccountIterator
 
 def menu():
   menu = """
@@ -120,8 +121,9 @@ def listar_contas(clientes):
   if not contas:
     print("Nenhuma conta cadastrada.")
     return
-  
-  for conta in contas:
+
+  iterator = AccountIterator(contas)
+  for conta in iterator:
     print("=" * 100)
     print(conta)
   print("=" * 100)
