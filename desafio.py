@@ -1,4 +1,5 @@
 from models_with_POO import *
+from decorator import log_transaction
 
 def menu():
   menu = """
@@ -17,6 +18,7 @@ def menu():
   opcao = int(input(menu))
   return opcao
 
+@log_transaction
 def deposito(clientes):
     cpf = input("Informe o CPF do cliente: ")
     cliente = buscar_cliente(cpf, clientes)
@@ -32,7 +34,9 @@ def deposito(clientes):
     transacao = Deposit(valor)
 
     cliente.carry_out_transaction(transacao, conta)
+    return True
 
+@log_transaction
 def saque(clientes):
     cpf = input("Informe o CPF do cliente: ")
     cliente = buscar_cliente(cpf, clientes)
@@ -48,8 +52,9 @@ def saque(clientes):
     transacao = Withdrawal(valor)
 
     cliente.carry_out_transaction(transacao, conta)
+    return True
 
-  
+@log_transaction
 def mostrar_extrato(clientes):
   cpf = input("Informe o CPF do cliente para ver o extrato: ")
   cliente = buscar_cliente(cpf, clientes)
@@ -72,7 +77,9 @@ def mostrar_extrato(clientes):
   print(extrato)
   print(f"\nSaldo: R$ {conta.balance:.2f}")
   print("==========================================")
+  return True
 
+@log_transaction
 def cadastrar_cliente(clientes):
   cpf = input("Informe o CPF (apenas números): ")
   usuario_cadastrado = buscar_cliente(cpf, clientes)
@@ -88,8 +95,9 @@ def cadastrar_cliente(clientes):
   cliente = NaturalPerson(nome, data_nascimento, cpf, endereco)
   clientes.append(cliente)
   print("Cliente cadastrado com sucesso!")
-  return
+  return True
 
+@log_transaction
 def criar_conta_corrente(clientes, contas, numero_conta):
   cpf = input("Informe o CPF do cliente: ")
   cliente_cadastrado = buscar_cliente(cpf, clientes)
@@ -98,6 +106,7 @@ def criar_conta_corrente(clientes, contas, numero_conta):
     contas.append(nova_conta)
     cliente_cadastrado.add_account(nova_conta)
     print(f"Conta criada com sucesso! Agência: {nova_conta.agency}, Conta: {nova_conta.number:04d}")
+    return True
   else:
     print("Cliente não encontrado. Cadastre o cliente primeiro.")
     return
