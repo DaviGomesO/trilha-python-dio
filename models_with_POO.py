@@ -19,6 +19,10 @@ class Client:
         self._accounts.append(account)
 
     def carry_out_transaction(self, transaction, account):
+        transactions_today = account.history.today_transactions()
+        if len(transactions_today) >= account.daily_transactions_limit:
+            print("@@@ Transaction limit for the day exceeded! @@@")
+            return
         transaction.register(account)
 
 
@@ -89,10 +93,11 @@ class Account:
 
 
 class CurrentAccount(Account):
-    def __init__(self, client, number, limit=500, withdraw_limit=3):
+    def __init__(self, client, number, limit=500, withdraw_limit=3, daily_transactions_limit=10):
         super().__init__(client, number)
         self._limit = limit
         self._withdraw_limit = withdraw_limit
+        self._daily_transactions_limit = daily_transactions_limit
 
     @property
     def limit(self):
@@ -102,9 +107,14 @@ class CurrentAccount(Account):
     def withdraw_limit(self):
         return self._withdraw_limit
     
+    @property
+    def daily_transactions_limit(self):
+        return self._daily_transactions_limit
+    
     def withdraw(self, amount):
         # Sacar dinheiro
-        number_withdrawals_today = sum(1 for details in self.history.transactions if details["type"] == "Withdrawal" and details["date"].startswith(datetime.now().strftime("%d-%m-%Y")))
+        number_withdrawals_today = sum(1 for details in self.history.transactions if details["type"] == "Withdrawal" and details["date"].startswith(datetime.now().strftime("%d/%m/%Y")))
+        print(number_withdrawals_today)
         
         exceeded_limit = amount > self.limit
         exceeded_withdraw_limit = number_withdrawals_today >= self.withdraw_limit
@@ -130,7 +140,7 @@ class History:
         return self._transactions
     
     def add_transaction(self, transaction):
-        self._transactions.append({"type": transaction.__class__.__name__, "value": transaction.value, "date": datetime.now().strftime("%d-%m-%Y %H:%M:%S")})
+        self._transactions.append({"type": transaction.__class__.__name__, "value": transaction.value, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S")})
 
     def generate_report(self, type_transaction=None):
         header = "\n================ EXTRATO ================"
@@ -170,6 +180,10 @@ class History:
                 type_op = 'Depósito' if op['type'] == 'Deposit' else 'Saque'
                 extract = f"\n{op['date']}\nOperação: {type_op}\nValor:\tR$ {op['value']:.2f}\n"
                 yield extract
+    
+    def today_transactions(self):
+        today = datetime.now().strftime("%d/%m/%Y")
+        return [t for t in self.transactions if t["date"].startswith(today)]
         
     
 class Transaction(ABC):
