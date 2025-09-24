@@ -65,16 +65,11 @@ def mostrar_extrato(clientes):
   conta = recuperar_conta_cliente(cliente)
   if not conta:
     return
+
+  type_transaction = input("Informe o tipo de transação para o extrato (D-Depósito, S-Saque ou Enter para todos): ").upper()
   
-  print("\n================ EXTRATO ================")
-  transacoes = conta.history.transactions
-  extrato = ""
-  if transacoes:
-    for op in transacoes:
-      extrato += f"\n{op['date']}\nOperação: {'Depósito' if op['type'] == 'Deposit' else 'Saque'}\nValor:\tR$ {op['value']:.2f}\n"
-  else:
-    extrato = "Não foram realizadas movimentações."
-  print(extrato)
+  conta.history.generate_report(type_transaction if type_transaction in ["D", "S"] else None)
+  
   print(f"\nSaldo: R$ {conta.balance:.2f}")
   print("==========================================")
   return True

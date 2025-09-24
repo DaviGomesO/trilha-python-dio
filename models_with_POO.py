@@ -132,6 +132,35 @@ class History:
     def add_transaction(self, transaction):
         self._transactions.append({"type": transaction.__class__.__name__, "value": transaction.value, "date": datetime.now().strftime("%d-%m-%Y %H:%M:%S")})
 
+    def generate_report(self, type_transaction=None):
+        header = "\n================ EXTRATO ================"
+        extract = ""
+        transactions = self.transactions
+        if transactions:
+            if type_transaction == "D":
+                header = "\n================ EXTRATO - DEPÓSITO ================"
+                deposits = [op for op in transactions if op["type"] == "Deposit"]
+                if deposits:
+                    for op in deposits:
+                        extract += f"\n{op['date']}\nOperação: Depósito\nValor:\tR$ {op['value']:.2f}\n"
+                else:
+                    extract = "Não foram realizadas movimentações de depósito."
+            elif type_transaction == "S":
+                header = "\n================ EXTRATO - SAQUE ================"
+                withdrawals = [op for op in transactions if op["type"] == "Withdrawal"]
+                if withdrawals:
+                    for op in withdrawals:
+                        extract += f"\n{op['date']}\nOperação: Saque\nValor:\tR$ {op['value']:.2f}\n"
+                else:
+                    extract = "Não foram realizadas movimentações de saque."
+            else:
+                for op in transactions:
+                    extract += f"\n{op['date']}\nOperação: {'Depósito' if op['type'] == 'Deposit' else 'Saque'}\nValor:\tR$ {op['value']:.2f}\n"
+        else:
+            extract = "Não foram realizadas movimentações."
+        print(header)
+        print(extract)
+        
     
 class Transaction(ABC):
     """ Classe abstrata, vai garantir o contrato para as classe que à herdem. """
