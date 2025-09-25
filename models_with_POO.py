@@ -10,7 +10,7 @@ class Client:
     @property
     def address(self):
         return self._address
-    
+
     @property
     def accounts(self):
         return self._accounts
@@ -36,7 +36,7 @@ class NaturalPerson(Client):
     def __repr__(self):
         return f"<{self.__class__.__name__}: ({self.cpf})"
 
-    
+
 class Account:
     def __init__(self, client, number):
         self._balance = 0
@@ -48,27 +48,27 @@ class Account:
     @property
     def balance(self):
         return self._balance
-    
+
     @property
     def number(self):
         return self._number
-    
+
     @property
     def agency(self):
         return self._agency
-    
+
     @property
     def client(self):
         return self._client
-    
+
     @property
     def history(self):
         return self._history
-    
+
     @classmethod
     def new_account(cls, client, number):
         return cls(client, number)
-        
+
     def withdraw(self, amount):
         # Sacar dinheiro
         balance = self.balance
@@ -105,20 +105,24 @@ class CurrentAccount(Account):
     @property
     def limit(self):
         return self._limit
-  
+
     @property
     def withdraw_limit(self):
         return self._withdraw_limit
-    
+
     @property
     def daily_transactions_limit(self):
         return self._daily_transactions_limit
-    
+
     def withdraw(self, amount):
         # Sacar dinheiro
-        number_withdrawals_today = sum(1 for details in self.history.transactions if details["type"] == "Withdrawal" and details["date"].startswith(datetime.now().strftime("%d/%m/%Y")))
+        number_withdrawals_today = sum(
+            1
+            for details in self.history.transactions
+            if details["type"] == "Withdrawal" and details["date"].startswith(datetime.now().strftime("%d/%m/%Y"))
+        )
         print(number_withdrawals_today)
-        
+
         exceeded_limit = amount > self.limit
         exceeded_withdraw_limit = number_withdrawals_today >= self.withdraw_limit
 
@@ -132,7 +136,7 @@ class CurrentAccount(Account):
 
     def __str__(self):
         return f"Agency: {self.agency} | Current Account: {self.number} | Client: {self.client.name}"
-    
+
     def __repr__(self):
         return f"<{self.__class__.__name__}: ({self.agency}, {self.number}, {self.client.name})>"
 
@@ -140,13 +144,19 @@ class CurrentAccount(Account):
 class History:
     def __init__(self):
         self._transactions = []
-    
+
     @property
     def transactions(self):
         return self._transactions
-    
+
     def add_transaction(self, transaction):
-        self._transactions.append({"type": transaction.__class__.__name__, "value": transaction.value, "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S")})
+        self._transactions.append(
+            {
+                "type": transaction.__class__.__name__,
+                "value": transaction.value,
+                "date": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+            }
+        )
 
     def generate_report(self, type_transaction=None):
         header = "\n================ EXTRATO ================"
@@ -165,7 +175,7 @@ class History:
                 extract = "Não foram realizadas movimentações de depósito."
                 yield extract
                 return
-            
+
             for op in deposits:
                 extract = f"\n{op['date']}\nOperação: Depósito\nValor:\tR$ {op['value']:.2f}\n"
                 yield extract
@@ -183,17 +193,18 @@ class History:
         else:
             yield header
             for op in transactions:
-                type_op = 'Depósito' if op['type'] == 'Deposit' else 'Saque'
+                type_op = "Depósito" if op["type"] == "Deposit" else "Saque"
                 extract = f"\n{op['date']}\nOperação: {type_op}\nValor:\tR$ {op['value']:.2f}\n"
                 yield extract
-    
+
     def today_transactions(self):
         today = datetime.now().strftime("%d/%m/%Y")
         return [t for t in self.transactions if t["date"].startswith(today)]
-        
-    
+
+
 class Transaction(ABC):
-    """ Classe abstrata, vai garantir o contrato para as classe que à herdem. """
+    """Classe abstrata, vai garantir o contrato para as classe que à herdem."""
+
     @property
     @abstractmethod
     def value(self):
@@ -211,7 +222,7 @@ class Deposit(Transaction):
     @property
     def value(self):
         return self._amount
-    
+
     def register(self, account):
         sucess_transaction = account.deposit(self.value)
         if sucess_transaction:
@@ -225,7 +236,7 @@ class Withdrawal(Transaction):
     @property
     def value(self):
         return self._amount
-    
+
     def register(self, account):
         sucess_transaction = account.withdraw(self.value)
         if sucess_transaction:

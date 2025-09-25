@@ -3,15 +3,15 @@ class AccountIterator:
         self._accounts = accounts
         self._index = 0
         pass
-    
+
     @property
     def accounts(self):
         return self._accounts
-    
+
     @property
     def index(self):
         return self._index
-    
+
     @index.setter
     def index(self, value):
         self._index = value
